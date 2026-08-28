@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/chat")({
         let model;
         if (groqKey) {
           const groq = createGroqProvider(groqKey);
-          model = groq("openai/gpt-oss-120b");
+          model = groq("meta-llama/llama-prompt-guard-2-86m");
         } else {
           return new Response(
             "Falta configurar una API key: define GROQ_API_KEY (gratis, ver src/lib/ai-gateway.server.ts).",
