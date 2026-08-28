@@ -34,15 +34,13 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Messages are required", { status: 400 });
         }
 
-        // ── Elige el proveedor de IA ──────────────────────────────────────
-        // Opción gratuita: Groq. Configura tu clave en un archivo .env como:
-        // GROQ_API_KEY=tu_clave_aqui (o defínela como variable de entorno en Render).
+        // ── Opción Groq ──────────────────────────────────────────────────
         const groqKey = process.env["GROQ_API_KEY"] ?? "";
 
         let model;
         if (groqKey) {
           const groq = createGroqProvider(groqKey);
-          model = groq("openai/gpt-oss-120b"); // modelo gratuito de Groq
+          model = groq("openai/gpt-oss-120b");
         } else {
           return new Response(
             "Falta configurar una API key: define GROQ_API_KEY (gratis, ver src/lib/ai-gateway.server.ts).",
@@ -50,15 +48,22 @@ export const Route = createFileRoute("/api/chat")({
           );
         }
 
+        // 🟢 SOLUCIÓN: Tomamos únicamente los últimos 6 mensajes del historial
+        const recentMessages = (messages as UIMessage[]).slice(-6);
+
         const result = streamText({
           model,
           system: systemPrompt,
-          messages: await convertToModelMessages(messages as UIMessage[]),
+          messages: await convertToModelMessages(recentMessages),
         });
 
         return result.toUIMessageStreamResponse({
           originalMessages: messages as UIMessage[],
         });
+      },
+    },
+  },
+});
       },
     },
   },
