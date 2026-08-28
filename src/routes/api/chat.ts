@@ -14,11 +14,11 @@ const catalogSummary = CATALOG.map(
 
 const systemPrompt = `Eres "Fidel", el asistente virtual oficial de D'Fidel-Export e Import (empresa dominicana de importación y exportación de frutas premium).
 
-### 🚨 REGLAS OBLIGATORIAS (NO LAS VIOLAR BAJO NINGUNA CIRCUNSTANCIA):
+### 🚨 REGLAS OBLIGATORIAS:
 1. **CONTACTOS OFICIALES:** WhatsApp: ${WHATSAPP_NUMBER} | Correo: dfidelexport@gmail.com.
-2. **PROHIBIDO INVENTAR DATOS:** Queda estrictamente PROHIBIDO inventar o proporcionar números de teléfono, correos adicionales o precios exactos que no estén en estas instrucciones.
-3. **COTIZACIONES:** Pide producto, cantidad, destino y presentación, e indica al cliente que use el formulario de cotización en /catalogo.
-4. **TONO Y ESTILO:** Responde siempre en el idioma del cliente, en tono cálido, profesional y breve (2 a 5 frases). Usa markdown ligero (listas, negritas) cuando aporte claridad.
+2. **PROHIBIDO INVENTAR DATOS:** No inventes teléfonos, correos o precios exactos.
+3. **COTIZACIONES:** Pide producto, cantidad, destino y presentación, e indica al cliente que use el formulario en /catalogo.
+4. **TONO Y ESTILO:** Responde siempre en el idioma del cliente, en tono cálido, profesional y claro (2 a 5 frases). Usa markdown ligero (listas, negritas) cuando aporte claridad.
 
 ### DATOS OFICIALES DE LA EMPRESA:
 - Sede: República Dominicana.
@@ -43,23 +43,22 @@ export const Route = createFileRoute("/api/chat")({
         let model;
         if (groqKey) {
           const groq = createGroqProvider(groqKey);
-          // 🟢 Restablecido a tu modelo de Groq
           model = groq("openai/gpt-oss-120b");
         } else {
           return new Response(
-            "Falta configurar una API key: define GROQ_API_KEY (gratis, ver src/lib/ai-gateway.server.ts).",
+            "Falta configurar una API key: define GROQ_API_KEY.",
             { status: 500 },
           );
         }
 
-        // Tomamos únicamente los últimos 6 mensajes para no saturar los tokens
         const recentMessages = (messages as UIMessage[]).slice(-6);
 
         const result = streamText({
           model,
           system: systemPrompt,
           messages: await convertToModelMessages(recentMessages),
-          temperature: 0.1, // Evita que se invente datos o correos
+          temperature: 0.1,
+          maxTokens: 600, // 🟢 Le da margen suficiente para responder sin cortarse
         });
 
         return result.toUIMessageStreamResponse({
