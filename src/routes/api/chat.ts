@@ -12,17 +12,21 @@ const catalogSummary = CATALOG.map(
     `- ${p.name} (${p.category}): ${p.description} Origen: ${p.origin}. Temporada: ${p.season}. Formato: ${p.packaging}. Calibres: ${p.calibres}.`,
 ).join("\n");
 
-const systemPrompt = `Eres "Fidel", el asistente virtual de D'Fidel-Export e Import, una empresa dominicana de importación y exportación de frutas premium.
+const systemPrompt = `Eres "Fidel", el asistente virtual oficial de D'Fidel-Export e Import (empresa dominicana de importación y exportación de frutas premium).
 
-Reglas:
-- Responde siempre en el idioma del cliente (por defecto español), en tono cálido, profesional y breve (2-5 frases).
-- Ayuda con: catálogo y disponibilidad, temporadas, orígenes, calibres, formatos de caja, logística y cadena de frío, y cómo solicitar una cotización.
-- Para cotizaciones, pide producto, cantidad, destino y presentación, y luego indica al cliente que use el formulario de cotización de la página /catalogo.
-- No inventes precios, certificaciones ni plazos exactos: indica que el equipo comercial confirma precio y disponibilidad según lote y destino.
-- Datos de la empresa: sede en Republica Dominicana, horario Lun-Vie 08:00-18:00, contacto comercial ${WHATSAPP_NUMBER}, correo electronico: dfidelexport@gmail.com.
-- Usa markdown ligero (listas, negritas) cuando aporte claridad.
+### 🚨 REGLAS OBLIGATORIAS (NO LAS VIOLAR BAJO NINGUNA CIRCUNSTANCIA):
+1. **CONTACTOS OFICIALES:** WhatsApp: ${WHATSAPP_NUMBER} | Correo: dfidelexport@gmail.com.
+2. **PROHIBIDO INVENTAR DATOS:** Queda estrictamente PROHIBIDO inventar o proporcionar números de teléfono, correos adicionales o precios exactos que no estén en estas instrucciones.
+3. **COTIZACIONES:** Pide producto, cantidad, destino y presentación, e indica al cliente que use el formulario de cotización en /catalogo.
+4. **TONO Y ESTILO:** Responde siempre en el idioma del cliente, en tono cálido, profesional y breve (2 a 5 frases). Usa markdown ligero (listas, negritas) cuando aporte claridad.
 
-Catálogo actual:
+### DATOS OFICIALES DE LA EMPRESA:
+- Sede: República Dominicana.
+- Horario: Lunes a Viernes de 08:00 a 18:00.
+- WhatsApp: ${WHATSAPP_NUMBER}
+- Correo electrónico: dfidelexport@gmail.com
+
+### CATÁLOGO ACTUAL:
 ${catalogSummary}`;
 
 export const Route = createFileRoute("/api/chat")({
@@ -34,12 +38,12 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Messages are required", { status: 400 });
         }
 
-        // ── Opción Groq ──────────────────────────────────────────────────
         const groqKey = process.env["GROQ_API_KEY"] ?? "";
 
         let model;
         if (groqKey) {
           const groq = createGroqProvider(groqKey);
+          // 🟢 Restablecido a tu modelo de Groq
           model = groq("openai/gpt-oss-120b");
         } else {
           return new Response(
@@ -48,22 +52,19 @@ export const Route = createFileRoute("/api/chat")({
           );
         }
 
-        // 🟢 SOLUCIÓN: Tomamos únicamente los últimos 6 mensajes del historial
+        // Tomamos únicamente los últimos 6 mensajes para no saturar los tokens
         const recentMessages = (messages as UIMessage[]).slice(-6);
 
         const result = streamText({
           model,
           system: systemPrompt,
           messages: await convertToModelMessages(recentMessages),
+          temperature: 0.1, // Evita que se invente datos o correos
         });
 
         return result.toUIMessageStreamResponse({
           originalMessages: messages as UIMessage[],
         });
-      },
-    },
-  },
-});
       },
     },
   },
