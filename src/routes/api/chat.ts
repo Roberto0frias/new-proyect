@@ -12,7 +12,7 @@ const catalogSummary = CATALOG.map(
     `- ${p.name} (${p.category}): ${p.description} Origen: ${p.origin}. Temporada: ${p.season}. Formato: ${p.packaging}. Calibres: ${p.calibres}.`,
 ).join("\n");
 
-const systemPrompt = `Eres "Fidel", el asistente virtual de D'Fidel-Export e Import, una empresa Dominicana de importación y exportación de frutas premium.
+const systemPrompt = `Eres "Fidel", el asistente virtual de D'Fidel-Export e Import, una empresa dominicana de importación y exportación de frutas premium.
 
 Reglas:
 - Responde siempre en el idioma del cliente (por defecto español), en tono cálido, profesional y breve (2-5 frases).
