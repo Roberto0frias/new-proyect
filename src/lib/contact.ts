@@ -1,4 +1,4 @@
-export const WHATSAPP_NUMBER = "+18094098346";
+export const WHATSAPP_NUMBER = "";
 export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`;
 
 // Gmail donde llegarán los mensajes del formulario de contacto de la Home.
@@ -6,7 +6,7 @@ export const CONTACT_EMAIL = "dfidelexport@gmail.com";
 
 // Clave gratuita de Web3Forms asociada a CONTACT_EMAIL.
 // Se obtiene en https://web3forms.com introduciendo ese Gmail (sin registro, es instantáneo).
-export const WEB3FORMS_ACCESS_KEY = "PON_AQUI_TU_ACCESS_KEY";
+export const WEB3FORMS_ACCESS_KEY = "d307366a-15e4-4237-a627-617c5aa05e4a";
 
 export function whatsappProductLink(productName: string) {
   const text = encodeURIComponent(
