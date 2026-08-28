@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/chat")({
         let model;
         if (groqKey) {
           const groq = createGroqProvider(groqKey);
-          model = groq("meta-llama/llama-prompt-guard-2-22m"); // modelo gratuito de Groq
+          model = groq("llama-prompt-guard-2-22m"); // modelo gratuito de Groq
         } else {
           return new Response(
             "Falta configurar una API key: define GROQ_API_KEY (gratis, ver src/lib/ai-gateway.server.ts).",
